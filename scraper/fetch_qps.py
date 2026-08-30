@@ -97,6 +97,8 @@ async def download_pdf(
     resp.raise_for_status()
 
     base64_string = resp.text.strip('"')
+    base64_string = base64_string.split("&&")[0]
+    base64_string += "=" * (-len(base64_string) % 4)
     pdf_bytes = base64.b64decode(base64_string)
 
     if not pdf_bytes.startswith(b"%PDF"):
