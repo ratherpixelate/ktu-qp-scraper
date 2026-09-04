@@ -14,10 +14,10 @@ def extract_course_code(text: str) -> str | None:
     m = COURSE_CODE_RE.search(text)
     if not m:
         return None
-    # PDF text extraction sometimes inserts stray spaces inside a course
-    # code (e.g. "PBCVT 404" instead of "PBCVT404") due to font kerning —
-    # capture the whole line and strip internal whitespace back out.
-    code = re.sub(r"\s+", "", m.group(1))
+    # PDF text extraction sometimes inserts stray whitespace or punctuation
+    # inside/around a course code (e.g. "PBCVT 404" or "-PCMET205" instead
+    # of "PBCVT404"/"PCMET205") — keep only letters and digits.
+    code = re.sub(r"[^A-Za-z0-9]", "", m.group(1))
     return code or None
 
 
