@@ -6,13 +6,19 @@ from pypdf import PdfReader, PdfWriter
 DOWNLOADS_DIR = Path(__file__).parent / "downloads"
 OUTPUT_DIR = Path(__file__).parent / "papers"
 
-COURSE_CODE_RE = re.compile(r"Course Code:\s*(\S+)")
+COURSE_CODE_RE = re.compile(r"Course Code:\s*([^\n]+)")
 SEMESTER_NUM_RE = re.compile(r"(\d+)")
 
 
 def extract_course_code(text: str) -> str | None:
     m = COURSE_CODE_RE.search(text)
-    return m.group(1).strip() if m else None
+    if not m:
+        return None
+    # PDF text extraction sometimes inserts stray spaces inside a course
+    # code (e.g. "PBCVT 404" instead of "PBCVT404") due to font kerning —
+    # capture the whole line and strip internal whitespace back out.
+    code = re.sub(r"\s+", "", m.group(1))
+    return code or None
 
 
 def split_bundle(pdf_path: Path, semester_num: str, branch_name: str) -> None:
